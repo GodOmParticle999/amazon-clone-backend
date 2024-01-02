@@ -77,8 +77,11 @@ const loginUser = async (req, res, next) => {
       return next(new ApiError(400, "wrong username or password!"));
 
     //  generating jwt access token
+   const token=user.generateJWTaccessToken()
+
     return res
       .status(200)
+      .cookie("access_token",token)
       .json(new ApiResponse(200, excludePassword(user), "logged in successfully!"));
   } catch (error) {
     return next(new ApiError(500, "internal server down! Please try again!"));
