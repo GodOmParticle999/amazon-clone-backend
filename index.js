@@ -25,10 +25,14 @@ dbConnect().then(()=>{
 
 // this middleware allows all the incoming request from client side 
 app.use(cors())
+// this parses the cookie header and populates the req.cookies object in a key value paired manner 
+const myCookie=(_,res,next)=>{
+    app.use(cookieParser)
+    next()
+}
+app.use(myCookie)
 
 app.use(Express.json())
-// this parses the cookie header and populates the req.cookies object in a key value paired manner 
-app.use(cookieParser)
 
 // this middleware leads to all the routes that come to user route
 app.use("/user",userRouter)

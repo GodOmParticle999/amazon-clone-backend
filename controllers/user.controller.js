@@ -1,4 +1,3 @@
-import { compareSync, hashSync } from "bcrypt";
 import { User } from "../models/user.model.js";
 import { ApiError } from "../utils/ApiError.js";
 import ApiResponse from "../utils/ApiResponse.js";
@@ -78,10 +77,13 @@ const loginUser = async (req, res, next) => {
 
     //  generating jwt access token
    const token=user.generateJWTaccessToken()
-
+   const options ={
+    httpOnly:true,
+    secure:true
+   }
     return res
       .status(200)
-      .cookie("access_token",token)
+      .cookie("access_token",token,options)
       .json(new ApiResponse(200, excludePassword(user), "logged in successfully!"));
   } catch (error) {
     return next(new ApiError(500, "internal server down! Please try again!"));
