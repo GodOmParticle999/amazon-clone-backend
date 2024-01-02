@@ -4,7 +4,7 @@ class ApiError extends Error{
         this.status=status
         this.success=false
         this.data=null 
-        this.stack=stack
+        
     }
     
 }
