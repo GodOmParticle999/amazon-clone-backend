@@ -50,6 +50,11 @@ userSchema.pre("save",async function (next){
   next()
  
 })
+// adding a method to validate password while logging in
+userSchema.methods.isPasswordCorrect= function (password){
+        return  bcrypt.compareSync(password,this.password)
+}
+
 // adding a method to this schema to generate jwt token
 userSchema.methods.generateJWTaccessToken=function (){
     return jwt.sign({
