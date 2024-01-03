@@ -35,4 +35,29 @@ return next(new ApiError(400, "ordered products can not be empty!"));
     return next(new ApiError(500, "something went wrong while placing order!"));
   }
 };
+
+// get all orders 
+// add middleware to authenticate that user should the logged in one or should be the admin
+export const getOrders =async(_,res,next)=>{
+
+try {
+   const allOrders=await Order.find({})
+    return res.status(200).json(
+      new ApiResponse(200,allOrders,"all orders are fetched successfully!")
+    )
+} catch (error) {
+  return next(new ApiError(500,"orders couldn't be fetched! try again later!"))
+}
+}
+export const getOrder=async(req,res,next)=>{
+  // get userId from cookies or url 
+   const {id}=req.params
+  try {
+    const myOrders=await Order.find({customer:id})
+     return res.status(200).json(new ApiResponse(200,myOrders,"Your all orders are here"))
+    }
+   catch (error) {
+    return next(new ApiError(500,"Your orders couldn't be fetched right now! try again"))
+  }
+}
 export default placeOrder;
