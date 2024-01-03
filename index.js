@@ -2,10 +2,11 @@ import dotenv from "dotenv"
 import  Express  from "express"
 
 import cors from "cors"
-import userRouter from "./routes/user.route.js"
+import userRoute from "./routes/user.route.js"
 import dbConnect from "./db/db.js"
 import errorHandler from "./middlewares/errorHandler.js"
 import cookieParser from "cookie-parser"
+import orderRoute from "./routes/order.route.js"
 // import dotenv.config at the top
 dotenv.config()
 
@@ -32,10 +33,14 @@ const myCookie=(_,res,next)=>{
 }
 app.use(myCookie)
 
+// this middleware parses the incoming json request and populates the req.body object with the parsed data
 app.use(Express.json())
 
 // this middleware leads to all the routes that come to user route
-app.use("/user",userRouter)
+app.use("/user",userRoute)
+
+// this middleware leads to all the routes that come to order route
+app.use("/order",orderRoute)
 
 // this middleware handles all kind of errors
 app.use(errorHandler)

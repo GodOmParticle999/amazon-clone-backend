@@ -28,4 +28,10 @@ const orderSchema=new mongoose.Schema({
 }
 )
 
+// orderSchema.post("save",async function(next){
+//     console.log(this)
+//     this._id
+//    return next()
+// })
+
 export const Order=mongoose.model("Order",orderSchema)
