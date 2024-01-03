@@ -5,7 +5,19 @@ import ApiResponse from "../utils/ApiResponse.js";
 const placeOrder = async (req, res, next) => {
   const { orderPrice, customer, orderedProducts } = req.body;
 
-  if (!customer || !orderPrice || orderedProducts?.length < 1)
+  // this function is needed to fix the insertion of empty object into the array
+  const isOrderedProductsEmpty=(orderedProducts)=>{
+   const arr=orderedProducts.map((obj)=>Object.keys(obj).length!==0)
+   return arr.includes(false)
+  }
+
+
+// if there is an insertion of empty object throw error
+if( isOrderedProductsEmpty(orderedProducts))
+return next(new ApiError(400, "ordered products can not be empty!"));
+
+// all fields must be present
+  if (!customer || !orderPrice )
     return next(new ApiError(400, "all the order information is required!"));
 
   try {
