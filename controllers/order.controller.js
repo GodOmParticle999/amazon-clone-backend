@@ -54,8 +54,15 @@ export const getOrder=async(req,res,next)=>{
    const {id}=req.params
   try {
     const myOrders=await Order.find({customer:id})
+
+    // if customer id is invalid somehow then the response will return empty but successful response
+    if(myOrders.length>0){
      return res.status(200).json(new ApiResponse(200,myOrders,"Your all orders are here"))
+    }else{
+      return next(new ApiError(404,"orders for this customer is not found"))
     }
+    }
+    
    catch (error) {
     return next(new ApiError(500,"Your orders couldn't be fetched right now! try again"))
   }
