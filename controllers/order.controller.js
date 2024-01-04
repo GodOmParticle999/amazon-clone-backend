@@ -1,6 +1,8 @@
 import { Order } from "../models/order.model.js";
+import { User } from "../models/user.model.js";
 import { ApiError } from "../utils/ApiError.js";
 import ApiResponse from "../utils/ApiResponse.js";
+import { Jwt } from "jsonwebtoken";
 
 const placeOrder = async (req, res, next) => {
   const { orderPrice, customer, orderedProducts } = req.body;
@@ -20,21 +22,54 @@ return next(new ApiError(400, "ordered products can not be empty!"));
   if (!customer || !orderPrice )
     return next(new ApiError(400, "all the order information is required!"));
 
-  try {
-    const orderPlacedDetail = await Order.create({
-      orderPrice,
-      customer,
-      orderedProducts,
-    });
-    return res
-      .status(201)
-      .json(
-        new ApiResponse(201, orderPlacedDetail, "order placed successfully!")
-      );
-  } catch (error) {
-    return next(new ApiError(500, "something went wrong while placing order!"));
-  }
-};
+  // try {
+  //   const orderPlacedDetail = await Order.create({
+  //     orderPrice,
+  //     customer,
+  //     orderedProducts,
+  //   });
+  //   return res
+  //     .status(201)
+  //     .json(
+  //       new ApiResponse(201, orderPlacedDetail, "order placed successfully!")
+  //     );
+  // } catch (error) {
+  //   return next(new ApiError(500, "something went wrong while placing order!"));
+  // }
+  const newOrder = new Order({
+    orderPrice,
+    customer,
+    orderedProducts,
+  });
+  if(newOrder){
+  // Save the new order to the database
+  await newOrder.save()
+
+  const token=req.cookies.access_token
+try {
+    const currentUser=jwt.verify(token,process.env.JWT_SECRET_KEY)
+    if(!currentUser) return next(new ApiError(401,"invalid access token"))
+
+      // Push the orderId of the newly created order into the orderHistory field of the user schema
+     const insertedData=await User.findOneAndUpdate(
+        {_id:currentUser._id},
+       { $push: { orderHistory: newOrder._id } },
+       { new: true })
+       if (!insertedData) {
+         return next(new ApiError(500,"something went wrong while placing order"))
+        } else {
+          return res.status(201).json(new ApiResponse(201,newOrder,"ordered successfully!"));
+        }
+    }
+      
+ catch (error) {
+  return next(new ApiError(500,"something went wrong while getting current user data"))
+}
+ 
+}     
+        
+      
+
 
 // get all orders 
 // add middleware to authenticate that user should the logged in one or should be the admin
