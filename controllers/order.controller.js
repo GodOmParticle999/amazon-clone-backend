@@ -9,7 +9,7 @@ const placeOrder = async (req, res, next) => {
   const { orderPrice, customer, orderedProducts } = req.body;
   //  get current logged in user that'll be used for two purpose
 
-  // const customer = req.data._id  
+  // const customer = req.user._id  COMING FROM MIDDLEWARE
 
   // extract / decode here later
   // this function is needed to fix the insertion of empty object into the array
@@ -26,7 +26,7 @@ return next(new ApiError(400, "ordered products can not be empty!"));
 // all fields must be present
   if (!customer || !orderPrice )
     return next(new ApiError(400, "all the order information is required!"));
-  
+
   const newOrder = new Order({
     orderPrice,
     customer,
@@ -80,6 +80,8 @@ try {
   return next(new ApiError(500,"orders couldn't be fetched! try again later!"))
 }
 }
+
+// get all orders of currently logged in user
 export const getOrder=async(req,res,next)=>{
   // get userId from cookies or url 
    const {id}=req.params

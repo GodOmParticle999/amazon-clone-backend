@@ -22,10 +22,9 @@ const userSchema= new mongoose.Schema({
         match:[/^[6-9]\d{9}$/,"Please enter a valid phone number"]
     },
     
-    role:{
-        type:String,
-        enum:["admin","user"],
-        default:"user"
+    isAdmin:{
+         type:Boolean,
+         default:false
     },
     orderHistory:[
        {
