@@ -2,11 +2,16 @@ import { Order } from "../models/order.model.js";
 import { User } from "../models/user.model.js";
 import { ApiError } from "../utils/ApiError.js";
 import ApiResponse from "../utils/ApiResponse.js";
-import { Jwt } from "jsonwebtoken";
+import jwt  from "jsonwebtoken";
 
 const placeOrder = async (req, res, next) => {
+  // CUSTOMER FIELD CAN BE EXTRACTED FROM REQ.COOKIES / REQ.user
   const { orderPrice, customer, orderedProducts } = req.body;
+  //  get current logged in user that'll be used for two purpose
 
+  // const customer = req.data._id  
+
+  // extract / decode here later
   // this function is needed to fix the insertion of empty object into the array
   const isOrderedProductsEmpty=(orderedProducts)=>{
    const arr=orderedProducts.map((obj)=>Object.keys(obj).length!==0)
@@ -21,21 +26,7 @@ return next(new ApiError(400, "ordered products can not be empty!"));
 // all fields must be present
   if (!customer || !orderPrice )
     return next(new ApiError(400, "all the order information is required!"));
-
-  // try {
-  //   const orderPlacedDetail = await Order.create({
-  //     orderPrice,
-  //     customer,
-  //     orderedProducts,
-  //   });
-  //   return res
-  //     .status(201)
-  //     .json(
-  //       new ApiResponse(201, orderPlacedDetail, "order placed successfully!")
-  //     );
-  // } catch (error) {
-  //   return next(new ApiError(500, "something went wrong while placing order!"));
-  // }
+  
   const newOrder = new Order({
     orderPrice,
     customer,
@@ -43,36 +34,41 @@ return next(new ApiError(400, "ordered products can not be empty!"));
   });
   if(newOrder){
   // Save the new order to the database
-  await newOrder.save()
-
-  const token=req.cookies.access_token
-try {
-    const currentUser=jwt.verify(token,process.env.JWT_SECRET_KEY)
-    if(!currentUser) return next(new ApiError(401,"invalid access token"))
-
-      // Push the orderId of the newly created order into the orderHistory field of the user schema
-     const insertedData=await User.findOneAndUpdate(
-        {_id:currentUser._id},
-       { $push: { orderHistory: newOrder._id } },
-       { new: true })
-       if (!insertedData) {
-         return next(new ApiError(500,"something went wrong while placing order"))
-        } else {
-          return res.status(201).json(new ApiResponse(201,newOrder,"ordered successfully!"));
+  newOrder.save().then(async(savedOrder)=>{
+    const token=req.cookies.access_token
+    try {
+      // do this on top
+        const currentUser=jwt.verify(token,process.env.JWT_SECRET_KEY)
+        if(!currentUser) {return next(new ApiError(401,"invalid access token"))}
+    
+          // Push the orderId of the newly created order into the orderHistory field of the user schema
+         const insertedData=await User.findOneAndUpdate(
+            {_id:currentUser._id},
+           { $push: { orderHistory: savedOrder._id } },
+           { new: true })
+           if (!insertedData) {
+             return next(new ApiError(500,"something went wrong while placing order"))
+            } else {
+              return res.status(201).json(new ApiResponse(201,savedOrder,"ordered successfully!"));
+            }
         }
+          
+     catch (error) {
+      return next(new ApiError(500,"something went wrong while getting current user data"))
     }
-      
- catch (error) {
-  return next(new ApiError(500,"something went wrong while getting current user data"))
-}
+  }).catch((error)=>{
+     return next (new ApiError(500,error))
+  })
+
+ 
  
 }     
-        
+}      
       
 
 
 // get all orders 
-// add middleware to authenticate that user should the logged in one or should be the admin
+// add middleware to authenticate that user should be the admin
 export const getOrders =async(_,res,next)=>{
 
 try {
@@ -102,4 +98,4 @@ export const getOrder=async(req,res,next)=>{
     return next(new ApiError(500,"Your orders couldn't be fetched right now! try again"))
   }
 }
-export default placeOrder;
+export default placeOrder

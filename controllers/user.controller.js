@@ -68,12 +68,12 @@ const loginUser = async (req, res, next) => {
 
   try {
     const user = await User.findOne({ email });
-    if (!user) return next(new ApiError(400, "wrong credentials!"));
+    if (!user) return next(new ApiError(400, "invalid credentials!"));
     //  user exists then match password using custom method
     const isPasswordCorrect = user.isPasswordCorrect(password);
 
     if (!isPasswordCorrect)
-      return next(new ApiError(400, "wrong username or password!"));
+      return next(new ApiError(400, "invalid credentials!"));
 
     //  generating jwt access token
    const token=user.generateJWTaccessToken()
