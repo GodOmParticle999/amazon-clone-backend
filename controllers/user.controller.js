@@ -90,7 +90,7 @@ const loginUser = async (req, res, next) => {
   }
 };
 // get all users
-// make this secured 
+// admin access only
 const getUsers = async (_, res) => {
   try {
     const users = await User.find({}).select("-password");
@@ -102,5 +102,21 @@ const getUsers = async (_, res) => {
     });
   }
 };
+
+// logout user
+export const logOut=(_,res)=>{
+  const options ={
+    httpOnly:true,
+    secure:true
+  }
+  try {
+    res.status(200).clearCookie("access_token",options)
+    .json(
+      new ApiResponse(200,{},"logged out successfully!")
+    )
+  } catch (error) {
+    return next(500,"something went wrong while logging out!")
+  }
+}
 
 export { registerUser, getUsers, loginUser };
