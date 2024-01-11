@@ -9,8 +9,9 @@ const placeOrder = async (req, res, next) => {
   const { orderPrice, customer, orderedProducts } = req.body;
   //  get current logged in user that'll be used for two purpose
 
-  // const customer = req.user._id  COMING FROM MIDDLEWARE
-
+  //  COMING FROM MIDDLEWARE
+  const customerId = req.user._id 
+  if(!customerId) return next(new ApiError(404,"unauthorized access! please login first!!"))
   // extract / decode here later
   // this function is needed to fix the insertion of empty object into the array
   const isOrderedProductsEmpty=(orderedProducts)=>{
@@ -35,15 +36,11 @@ return next(new ApiError(400, "ordered products can not be empty!"));
   if(newOrder){
   // Save the new order to the database
   newOrder.save().then(async(savedOrder)=>{
-    const token=req.cookies.access_token
-    try {
-      // do this on top
-        const currentUser=jwt.verify(token,process.env.JWT_SECRET_KEY)
-        if(!currentUser) {return next(new ApiError(401,"invalid access token"))}
     
+    try {
           // Push the orderId of the newly created order into the orderHistory field of the user schema
          const insertedData=await User.findOneAndUpdate(
-            {_id:currentUser._id},
+            {_id:customerId},
            { $push: { orderHistory: savedOrder._id } },
            { new: true })
            if (!insertedData) {

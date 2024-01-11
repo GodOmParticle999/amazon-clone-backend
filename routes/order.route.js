@@ -7,7 +7,7 @@ const orderRoute=Express.Router()
 orderRoute.route("/placeOrder").post(verifyJWT ,placeOrder)
 
 // add middleware to verify admin
-orderRoute.route("/getOrders").get(verifyAdmin,getOrders)
+orderRoute.route("/getOrders").get(verifyJWT,verifyAdmin,getOrders)
 
 orderRoute.route("/getOrder/:id").get(getOrder)
 
