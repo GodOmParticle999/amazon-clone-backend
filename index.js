@@ -25,7 +25,7 @@ dbConnect()
 // middlewares
 
 // this middleware allows all the incoming request from client side
-app.use(cors({ origin: "http://localhost:3000", credentials: true }));
+app.use(cors({ origin: process.env.ORIGIN, credentials: true }));
 // this parses the cookie header and populates the req.cookies object in a key value paired manner
 // const myCookie=(_,res,next)=>{
 //     app.use(cookieParser)
