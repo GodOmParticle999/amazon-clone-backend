@@ -59,11 +59,9 @@ userSchema.methods.generateJWTaccessToken=function (){
     return jwt.sign({
         id:this._id,
         email:this.email,
-        name:this.name,
-        phoneNumber:this.phoneNumber
-    },process.env.JWT_SECRET_KEY,{
-        expiresIn:process.env.JWT_EXPIRES_IN
-    })
+        
+        name:this.name
+    },process.env.JWT_SECRET_KEY)
 }
 
 export const User=mongoose.model("User",userSchema)

@@ -78,6 +78,7 @@ const loginUser = async (req, res, next) => {
     //  generating jwt access token
    const token=user.generateJWTaccessToken()
    const options ={
+    expires:new Date(Date.now()+2*60*1000),
     httpOnly:true,
     secure:true
    }

@@ -9,7 +9,7 @@ export const verifyJWT=async(req,res,next)=>{
 
     const decodedToken=jwt.verify(token,process.env.JWT_SECRET_KEY)
    try {
-    const user=await User.findById(decodedToken._id).select("-password ")
+    const user=await User.findById(decodedToken.id).select("-password ")
     if(!user) return next(new ApiError(401,"invalid access token!"))
     
     // bind this user to req to be access further 
