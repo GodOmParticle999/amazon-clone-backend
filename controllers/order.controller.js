@@ -81,7 +81,8 @@ try {
 // get all orders of currently logged in user
 export const getOrder=async(req,res,next)=>{
   // get userId from cookies or url 
-   const {id}=req.params
+  //  const {id}=req.params
+  const id=req.user._id 
   try {
     const myOrders=await Order.find({customer:id})
 
@@ -96,5 +97,20 @@ export const getOrder=async(req,res,next)=>{
    catch (error) {
     return next(new ApiError(500,"Your orders couldn't be fetched right now! try again"))
   }
+}
+
+
+export const cancelOrder=async(req,_,next)=>{
+        const {id} =req.params
+          
+        if(!id) return next(new ApiError(404,"Order Id not found !"))
+
+       try {
+         const response=await Order.findByIdAndUpdate({_id:id},{orderStatus:"CANCELLED"})
+         if(response) return res.status(200).json(new ApiResponse(200,response,"Your order cancelled successfully!"))
+         return next(new ApiError(500,"Order couldn't be cancelled !"))
+       } catch (error) {
+        return next(new ApiError(500,error))
+       }
 }
 export default placeOrder
