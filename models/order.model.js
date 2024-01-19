@@ -5,6 +5,12 @@ const orderSchema=new mongoose.Schema({
         type:Number,
         required:true
     },
+    orderStatus:{
+        type:String,
+        enum:['PENDING','PROCESSING','SHIPPED','OUT FOR DELIVERY','DELIVERED','CANCELLED'],
+        default:'PENDING'
+    }
+    ,
     customer:{
         type:mongoose.Schema.Types.ObjectId,
         ref:"User"
@@ -14,6 +20,10 @@ const orderSchema=new mongoose.Schema({
             productId:{
               type:String,
               required:true
+            },
+            productName:{
+                type:String,
+                required:true
             },
             quantity:{
                 type:Number,

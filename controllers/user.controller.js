@@ -67,7 +67,7 @@ const loginUser = async (req, res, next) => {
     return next(new ApiError(400, "email and password is required"));
 
   try {
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email }).select('-orderHistory');
     if (!user) return next(new ApiError(400, "invalid credentials!"));
     //  user exists then match password using custom method
     const isPasswordCorrect = user.isPasswordCorrect(password);
@@ -78,7 +78,7 @@ const loginUser = async (req, res, next) => {
     //  generating jwt access token
    const token=user.generateJWTaccessToken()
    const options ={
-    expires:new Date(Date.now()+2*60*1000),
+    expires:new Date(Date.now()+60*60*1000),
     httpOnly:true,
     secure:true
    }

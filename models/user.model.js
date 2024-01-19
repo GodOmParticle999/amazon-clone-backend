@@ -26,6 +26,7 @@ const userSchema= new mongoose.Schema({
          type:Boolean,
          default:false
     },
+    // remove this
     orderHistory:[
        {
          type:mongoose.Schema.Types.ObjectId,
@@ -61,7 +62,9 @@ userSchema.methods.generateJWTaccessToken=function (){
         email:this.email,
         
         name:this.name
-    },process.env.JWT_SECRET_KEY)
+    },process.env.JWT_SECRET_KEY,{
+        expiresIn:process.env.JWT_EXPIRES_IN
+    })
 }
 
 export const User=mongoose.model("User",userSchema)
